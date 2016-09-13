@@ -6,6 +6,7 @@
 #define PERIOD 5
 #define BIT_WIDTH 255
 
+
 int make_wait(int cycle);
 
 
