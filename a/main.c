@@ -13,10 +13,12 @@ int make_wait(int cycle);
 int main(void){
 	int cycle = 0, loop = 0, result = 0, surplus = 0, tmp = BIT_WIDTH, tmp2 = 0, i;
 	
-	puts("please input time[us]");
-	scanf("%d", &cycle);
+	do{
+		puts("please input time[us]");
+		scanf("%d", &cycle);
+	}while(cycle < 2 || 1600 < cycle);
+
 	cycle *= PERIOD;
-	
 	for(loop = BIT_WIDTH; loop > 0; loop--){
 		result = (cycle - L_OFFSET) / loop - 3;
 		surplus = (cycle - L_OFFSET) % loop;
@@ -31,7 +33,7 @@ int main(void){
 	
 	printf("all cycle = %d\nloop = %d\ncycle = %d\nsurplus = %d\n", cycle, tmp2, result, surplus);
 	
-	printf("DELAY\tMOVLW\t%d\n", tmp2);
+	printf("DELAY\n\tMOVLW\t%d\n", tmp2);
 	printf("\tMOVWF\tDR\n");
 	printf("LOOP\n");
 	make_wait(result);
