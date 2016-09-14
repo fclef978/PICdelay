@@ -14,7 +14,7 @@ int main(void){
 	int cycle = 0, loop = 0, result = 0, surplus = 0, tmp = BIT_WIDTH, tmp2 = 0, i;
 	
 	do{
-		puts("please input time[us]");
+		puts("please input time(2~1600[us])");
 		scanf("%d", &cycle);
 	}while(cycle < 2 || 1600 < cycle);
 
@@ -22,7 +22,7 @@ int main(void){
 	for(loop = BIT_WIDTH; loop > 0; loop--){
 		result = (cycle - L_OFFSET) / loop - 3;
 		surplus = (cycle - L_OFFSET) % loop;
-		if(tmp > surplus && result < 30 && result > 0){
+		if(tmp > surplus && result < 31 && result > 0){
 			tmp = surplus;
 			tmp2 = loop;
 		}
@@ -45,12 +45,9 @@ int main(void){
 }
 
 int make_wait(int cycle){
-	for(cycle++ ; cycle > 1; cycle--){
-		if(cycle > 2){
-			printf("\tGOTO\t$+1\n");
-			cycle--;
-		}else
-			printf("\tNOP\n");
-	}
+	if(cycle % 2 == 1)
+		printf("\tNOP\n");
+	for(cycle /= 2; cycle > 0; cycle--)
+		printf("\tGOTO\t$+1\n");
 	return 0;
 }
