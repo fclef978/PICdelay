@@ -1,19 +1,8 @@
 //Created by 978//
 //2016.9/17(Sat)//
 #include<stdio.h>
-#include"struct.c"
-
-
-#define T_MIN 2
-#define T_MAX 10000
-#define PERIOD 5
-#define L_OFFSET 5
-#define BIT_WIDTH 255
-
-
-int get_cycle(void);
-DelayElement evaluate_line(int cycle);
-int make_wait(int cycle);
+#include"prot.h"
+#include"def.h"
 
 
 int get_cycle(void){
@@ -55,4 +44,18 @@ int make_wait(int cycle){
 	for(cycle /= 2; cycle > 0; cycle--)
 		printf("\tGOTO\t$+1\n");
 	return 0;
+}
+
+
+void disp_result(DelayElement delay){
+	printf("all cycle = %d\nloop = %d\ncycle = %d\nsurplus = %d\n", delay.cycle, delay.loop, delay.intCycle, delay.surplus);
+
+	printf("DELAY\n\tMOVLW\t%d\n", delay.loop);
+	printf("\tMOVWF\tDR\n");
+	printf("LOOP\n");
+	make_wait(delay.intCycle);
+	printf("\tDECFSZ\tDR,1\n");
+	printf("\tGOTO\tLOOP\n");
+	make_wait(delay.surplus);
+	printf("\tRETURN\n");
 }
