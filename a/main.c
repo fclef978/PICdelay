@@ -1,11 +1,16 @@
 //Created by 978//
 //2016.9/17(Sat)//
 #include<stdio.h>
-#include"Prot.h"
+#include"PICdelay.h"
+
+
+Setting setting;
 
 
 int main(void){
-	int tmpCycle = get_cycle();
+	import_setting();
+
+	int tmpCycle = get_cycle(setting.period);
 
 	DelayElement delay = evaluate_line(tmpCycle);
 
