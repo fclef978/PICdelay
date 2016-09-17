@@ -1,26 +1,45 @@
-//Created by 978//
-//2016.9/17(Sat)//
+//=============================================================================
+// Contents   : PICのDELAYサブルーチンを生成する
+//              ヘッダ PICdelay.h
+// Author     : fclef978
+// LastUpdate : 2016/09/17
+// Since      : 2016/09/09
+// Comment    : 無理やりまとめスギィ！
+//=============================================================================
+
+
+/*
+ *	構造体
+ */
 typedef struct{
-	int cycle;
-	int loop;
-	int intCycle;
-	int surplus;
-}DelayElement;
+	int cycle;//総サイクル数
+	int loop;//ループ数
+	int intCycle;//ループ内サイクル数
+	int surplus;//余り
+}DelayElement;//ディレイの要素
 
 typedef struct{
-	double period;
-	char sl[64];
-	char rn[64];
-	char ll[64];
-}Setting;
+	double period;//クロック周期
+	char sl[64];//サブルーチンのラベル
+	char rn[64];//レジスタの名前
+	char ll[64];//ディレイ内ループポイントのラベル
+}Setting;//設定
 
 
-extern Setting setting;
+/*
+ *	グローバル変数
+ */
+extern Setting setting;//設定用の構造体
 
 
-int get_cycle(double period);
-DelayElement evaluate_line(int cycle);
-char *make_result(DelayElement delay, char result[]);
+/*
+ *	関数プロトタイプ宣言
+ */
+//func.c
+int get_cycle(void);//サイクル数の取得
+DelayElement evaluate_line(int cycle);//行数の一番少ない組み合わせを探す
+char *make_result(DelayElement delay, char result[]);//ソースコード生成
 
-void import_setting(void);
-void output(char *str);
+//fileio.c
+void import_setting(void);//設定ファイルから読み込み
+void output(char *str);//外部ファイルにソースコードを出力

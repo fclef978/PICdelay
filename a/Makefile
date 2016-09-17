@@ -1,4 +1,11 @@
-# PICdelay alpha0.1 Makefile
+#=============================================================================
+# Contents   : PICのDELAYサブルーチンを生成する
+#              プロジェクトのMakefile Makefile
+# Author     : fclef978
+# LastUpdate : 2016/09/17
+# Since      : 2016/09/09
+# Comment    : たいしたこと書いてない(今更)
+#=============================================================================
 
 #バイナリの名前
 PROGRAM = PICdelay.exe
@@ -8,6 +15,7 @@ OBJS = main.o func.o fileio.o
 $(PROGRAM): $(OBJS)
 	gcc $(OBJS) -o $@ -lm
 
+#サフィックスルール
 .c.o:
     gcc -c $< -W
 
