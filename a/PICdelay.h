@@ -1,11 +1,5 @@
 //Created by 978//
 //2016.9/17(Sat)//
-#define T_MIN 2
-#define T_MAX 10000
-#define L_OFFSET 5
-#define BIT_WIDTH 256
-
-
 typedef struct{
 	int cycle;
 	int loop;
@@ -26,6 +20,7 @@ extern Setting setting;
 
 int get_cycle(double period);
 DelayElement evaluate_line(int cycle);
-void disp_result(DelayElement delay);
+char *make_result(DelayElement delay, char result[]);
 
 void import_setting(void);
+void output(char *str);

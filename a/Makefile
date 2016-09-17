@@ -1,13 +1,17 @@
 # PICdelay alpha0.1 Makefile
 
-PICdelay.exe: main.o func.o fileio.o
-	gcc main.o func.o fileio.o -o PICdelay.exe -lm
+#バイナリの名前
+PROGRAM = PICdelay.exe
+OBJS = main.o func.o fileio.o
 
-main.o:main.c
-	gcc -c main.c -W
+#プライマリターゲット
+$(PROGRAM): $(OBJS)
+	gcc $(OBJS) -o $@ -lm
 
-func.o:func.c
-	gcc -c func.c -W
+.c.o:
+    gcc -c $< -W
 
-fileio.o:fileio.c
-	gcc -c fileio.c -W
+#ヘッダの依存関係
+main.o: PICdelay.h
+func.o: PICdelay.h
+fileio.o: PICdelay.h
