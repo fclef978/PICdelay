@@ -1,10 +1,10 @@
 //=============================================================================
-// Contents   : PICのDELAYサブルーチンを生成する
-//              ファイル入出力系関数置き場 fileio.c
-// Author     : fclef978
-// LastUpdate : 2016/09/17
-// Since      : 2016/09/09
-// Comment    : バグの山
+// Contents		: PICのDELAYサブルーチンを生成する
+//				: ファイル入出力系関数置き場 fileio.c
+// Author		: fclef978
+// LastUpdate	: 2016/09/25
+// Since		: 2016/09/09
+// Comment		: バグの山
 //=============================================================================
 
 
@@ -48,9 +48,9 @@ void import_setting(void){
 	//スキャン
 	fscanf(fp, "%s\r\n", s_tmp);
 	fscanf(fp, "SystemClock(Hz)=%s\r\n", tmp);
-	fscanf(fp, "SubroutineLabel=%s\r\n", &setting.sl);
-	fscanf(fp, "RegisterName=%s\r\n", &setting.rn);
-	fscanf(fp, "LoopLabel=%s\r\n", &setting.ll);
+	fscanf(fp, "SubroutineLabel=%s\r\n", setting.sl);
+	fscanf(fp, "RegisterName=%s\r\n", setting.rn);
+	fscanf(fp, "LoopLabel=%s\r\n", setting.ll);
 
 	puts("設定ファイル\"setting.ini\"の読み込み完了");
 

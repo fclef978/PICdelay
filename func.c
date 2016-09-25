@@ -1,11 +1,10 @@
 //=============================================================================
-// Contents		: PICのDELAYサブルーチンを生成する
+// Contents		: PICアセンブラのDELAYサブルーチンを生成する
 //				: 関数置き場 func.c
 // Author		: fclef978
 // LastUpdate	: 2016/09/25
 // Since		: 2016/09/09
 // Comment		: まるでスパゲッティソースみたいだあ(直喩)
-//Copyright		: (c) 2016 Copyright Holder All Rights Reserved.
 //=============================================================================
 
 
@@ -21,17 +20,17 @@
  *	マクロ
  */
 #define L_OFFSET 5//ループ計算時のオフセット
-#define L_OFFSET2 1//内側ループ計算時のオフセット
 #define BIT_WIDTH 256//プロセッサのビット幅
+#define OFFSET_D 4//内側ループと外側ループの差
 
 
 /*
  *	関数プロトタイプ宣言
  */
 static char *make_wait(int cycle, char tmp[]);//ループ内サイクルとか余りのサイクルを生成する
-static int calc_line(DelayElement delay);//行数計算
-static int calc_line_double(DelayElement delay[]);//行数計算
-static int calc_line_triple(DelayElement delay[]);//行数計算
+static int calc_line(DelayElement delay);//行数計算1
+static int calc_line_double(DelayElement delay[]);//行数計算2
+static int calc_line_triple(DelayElement delay[]);//行数計算3
 
 
 /*
@@ -55,12 +54,12 @@ int get_cycle(int max, int min){
  	int compLine = delay->cycle, tmpLine, tmpLoop;
  	DelayElement tmp = {delay->cycle, 0, 0, 0};
 
- 	for(tmp.loop = 1; tmp.loop < 256; tmp.loop++){
+ 	for(tmp.loop = 1; tmp.loop < BIT_WIDTH; tmp.loop++){
  		tmp.intCycle = (tmp.cycle - L_OFFSET) / tmp.loop - 3;
  		if(tmp.intCycle < 0) break;
  		tmp.surplus = (tmp.cycle - L_OFFSET) % tmp.loop;
  		tmpLine = calc_line(tmp);
- 		if(compLine > tmpLine){
+ 		if(compLine > tmpLine){//行数比較
  			compLine = tmpLine;
  			tmpLoop = tmp.loop;
  		}
@@ -79,11 +78,11 @@ int get_cycle(int max, int min){
  	DelayElement tmp[2];
  	tmp[0].cycle = delay[0].cycle;
 
- 	for(tmp[0].loop = 1; tmp[0].loop < 256; tmp[0].loop++){
+ 	for(tmp[0].loop = 1; tmp[0].loop < BIT_WIDTH; tmp[0].loop++){
  		tmp[0].intCycle = (tmp[0].cycle - L_OFFSET) / tmp[0].loop - 3;
  		if(tmp[0].intCycle < 10) break;
  		tmp[0].surplus = (tmp[0].cycle - L_OFFSET) % tmp[0].loop;
- 		tmp[1].cycle = tmp[0].intCycle + 4;
+ 		tmp[1].cycle = tmp[0].intCycle + OFFSET_D;//内側と外側のオフセットの差
  		evaluate_line(&tmp[1]);
  		tmpLine = calc_line_double(tmp);
  		if(compLine > tmpLine){
@@ -96,7 +95,7 @@ int get_cycle(int max, int min){
  	delay[0].intCycle = (delay[0].cycle - L_OFFSET) / delay[0].loop - 3;
  	delay[0].surplus = (delay[0].cycle - L_OFFSET) % delay[0].loop;
  	delay[1].cycle = delay[0].intCycle;
-	int tmpCycle = delay[0].intCycle + 4;
+	int tmpCycle = delay[0].intCycle + OFFSET_D;
  	delay[1].loop = tmpLoop[1];
  	delay[1].intCycle = (tmpCycle - L_OFFSET) / delay[1].loop - 3;
  	delay[1].surplus = (tmpCycle - L_OFFSET) % delay[1].loop;
@@ -107,15 +106,15 @@ int get_cycle(int max, int min){
  *	三重ループ版の行数の一番少ない組み合わせを探す
  */
 void evaluate_line_triple(DelayElement delay[]){
-	int compLine = delay[0].cycle, tmpLine, tmpLoop[3];
+	int compLine = delay[0].cycle, tmpLine, tmpLoop[3], i;
  	DelayElement tmp[3], tmp2[2];
  	tmp[0].cycle = delay[0].cycle;
 
- 	for(tmp[0].loop = 1; tmp[0].loop < 256; tmp[0].loop++){
+ 	for(tmp[0].loop = 1; tmp[0].loop < BIT_WIDTH; tmp[0].loop++){
  		tmp[0].intCycle = (tmp[0].cycle - L_OFFSET) / tmp[0].loop - 3;
  		if(tmp[0].intCycle < 10) break;
  		tmp[0].surplus = (tmp[0].cycle - L_OFFSET) % tmp[0].loop;
- 		tmp2[0].cycle = tmp[0].intCycle + 4;
+ 		tmp2[0].cycle = tmp[0].intCycle + OFFSET_D;
  		evaluate_line_double(tmp2);
 		tmp[1] = tmp2[0];
 		tmp[2] = tmp2[1];
@@ -130,16 +129,13 @@ void evaluate_line_triple(DelayElement delay[]){
  	delay[0].loop = tmpLoop[0];
  	delay[0].intCycle = (delay[0].cycle - L_OFFSET) / delay[0].loop - 3;
  	delay[0].surplus = (delay[0].cycle - L_OFFSET) % delay[0].loop;
- 	delay[1].cycle = delay[0].intCycle;
-	int tmpCycle = delay[0].intCycle + 4;
- 	delay[1].loop = tmpLoop[1];
- 	delay[1].intCycle = (tmpCycle - L_OFFSET) / delay[1].loop - 3;
- 	delay[1].surplus = (tmpCycle - L_OFFSET) % delay[1].loop;
- 	delay[2].cycle = delay[1].intCycle;
-	tmpCycle = delay[1].intCycle + 4;
- 	delay[2].loop = tmpLoop[2];
- 	delay[2].intCycle = (tmpCycle - L_OFFSET) / delay[2].loop - 3;
- 	delay[2].surplus = (tmpCycle - L_OFFSET) % delay[2].loop;
+	for(i = 1; i < 3; i++){
+ 		delay[i].cycle = delay[i - 1].intCycle;
+		int tmpCycle = delay[i - 1].intCycle + OFFSET_D;
+ 		delay[i].loop = tmpLoop[i];
+ 		delay[i].intCycle = (tmpCycle - L_OFFSET) / delay[i].loop - 3;
+ 		delay[i].surplus = (tmpCycle - L_OFFSET) % delay[i].loop;
+	}
 }
 
 
