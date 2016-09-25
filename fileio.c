@@ -52,6 +52,8 @@ void import_setting(void){
 	fscanf(fp, "RegisterName=%s\r\n", setting.rn);
 	fscanf(fp, "LoopLabel=%s\r\n", setting.ll);
 
+	fclose(fp);
+
 	puts("設定ファイル\"setting.ini\"の読み込み完了");
 
 	//システムクロック周波数から周期を計算
