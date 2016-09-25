@@ -2,7 +2,7 @@
 // Contents   : PICのDELAYサブルーチンを生成する
 //              メインプログラム main.c
 // Author     : fclef978
-// LastUpdate : 2016/09/17
+// LastUpdate : 2016/09/18
 // Since      : 2016/09/09
 // Comment    : さっぱりしていて、それでいてべたつかない。すっきりしたファイルだ。
 //=============================================================================
@@ -25,23 +25,62 @@ Setting setting;//設定用の構造体
  *	メイン関数
  */
 int main(void){
+	int selector = 0;
 	puts("PICdelay PICのDELAYサブルーチン生成機へようこそ");
 	import_setting();//設定ファイルから読み込み
+	//メインループ**************************************************************
+	do{
+		printf("\n0で終了、1で単ループモード、2で二重ループモード、3で三重ループモード\n==>");
+		scanf("%d", &selector);
 
-	int cycle = get_cycle();//サイクル数の取得
+		//単ループモード********************************************************
+		if(selector == 1){
+			DelayElement delay;
+			delay.cycle = get_cycle(1000, 2);
+			evaluate_line(&delay);//サイクル数の取得、行数の一番少ない組み合わせを探す
 
-	DelayElement delay = evaluate_line(cycle);//行数の一番少ない組み合わせを探す
+			char result[4096] = {""};
+			make_result(delay, result);//ソースコード生成
+			printf("////////////////\n以下よりコード\n////////////////\n\n");
+			printf("%s", result);//ソースコード表示
 
-	char result[1024] = {""};
-	make_result(delay, result);//ソースコード生成
-	printf("////////////////\n以下よりコード\n////////////////\n\n");
-	printf("%s", result);//ソースコード表示
+			output(result);//外部ファイルにソースコードを出力
 
-	output(result);//外部ファイルにソースコードを出力
+			puts("\n終了しました");
+		}
+		//二重ループモード******************************************************
+		else if(selector == 2){
+			DelayElement delay[2];
+			delay[0].cycle = get_cycle(500000, 100);	//サイクル数の取得
 
-	puts("\n終了します");
-	int tmp = 0;//適当に作った入力待ち
-	scanf("%d", &tmp);
+			evaluate_line_double(delay);//サイクル数の取得、行数の一番少ない組み合わせを探す
+
+			char result[4096] = {""};
+			make_result_double(delay, result);//ソースコード生成
+			printf("////////////////\n以下よりコード\n////////////////\n\n");
+			printf("%s", result);//ソースコード表示
+
+			output(result);//外部ファイルにソースコードを出力
+
+			puts("\n終了しました");
+		}
+		//三重ループモード******************************************************
+		else if(selector == 3){
+			DelayElement delay[3];
+			delay[0].cycle = get_cycle(100000000, 1000);	//サイクル数の取得
+
+			evaluate_line_triple(delay);//サイクル数の取得、行数の一番少ない組み合わせを探す
+
+			char result[4096] = {""};
+			make_result_triple(delay, result);//ソースコード生成
+			printf("////////////////\n以下よりコード\n////////////////\n\n");
+			printf("%s", result);//ソースコード表示
+
+			output(result);//外部ファイルにソースコードを出力
+
+			puts("\n終了しました");
+		}
+	}while(selector != 0);
 
 	return 0;//正常終了
 }
